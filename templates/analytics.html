@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-4">Score Analytics</h4>
+
+<div class="card p-4"
+     style="background:#1b1f2a; border:1px solid #2a2f3a; border-radius:12px;">
+
+<canvas id="scoreChart"></canvas>
+
+</div>
+
+<!-- Safely pass data using JSON script tag -->
+<script id="chart-data" type="application/json">
+{
+    "names": {{ names | tojson }},
+    "scores": {{ scores | tojson }}
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const chartData = JSON.parse(
+        document.getElementById("chart-data").textContent
+    );
+
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.names,
+            datasets: [{
+                label: 'CRT Scores',
+                data: chartData.scores,
+                backgroundColor: '#ffb800'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

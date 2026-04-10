@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html data-theme="dark" data-editor="dark">
+<head>
+    <title>{{ problem.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* ── SITE THEME VARS ── */
+    [data-theme="dark"] {
+        --bg:          #0b0f14;
+        --bg2:         #0d1117;
+        --nav-bg:      #0d1117;
+        --border:      rgba(255,255,255,0.07);
+        --border2:     rgba(255,255,255,0.13);
+        --text:        #e6edf3;
+        --text-muted:  #556370;
+        --text-dim:    #8899a6;
+        --accent:      #ffb800;
+        --accent-dim:  rgba(255,184,0,0.12);
+        --green:       #00ff88;
+        --red:         #ff4d4d;
+        --card-bg:     rgba(255,255,255,0.03);
+        --pre-bg:      #060a0f;
+    }
+    [data-theme="light"] {
+        --bg:          #f4f4ef;
+        --bg2:         #eaeae4;
+        --nav-bg:      #ffffff;
+        --border:      rgba(0,0,0,0.08);
+        --border2:     rgba(0,0,0,0.15);
+        --text:        #111620;
+        --text-muted:  #888;
+        --text-dim:    #555;
+        --accent:      #c98f00;
+        --accent-dim:  rgba(201,143,0,0.1);
+        --green:       #007a40;
+        --red:         #c0392b;
+        --card-bg:     rgba(0,0,0,0.02);
+        --pre-bg:      #e0e0da;
+    }
+
+    /* ── EDITOR THEME VARS (independent) ── */
+    [data-editor="dark"] {
+        --ed-bg:      #0d1117;
+        --ed-bg2:     #060a0f;
+        --ed-border:  rgba(255,255,255,0.1);
+        --ed-text:    #00ffcc;
+        --ed-stdin:   #adbac7;
+        --ed-label:   rgba(255,255,255,0.3);
+    }
+    [data-editor="light"] {
+        --ed-bg:      #fafafa;
+        --ed-bg2:     #f0f0f0;
+        --ed-border:  rgba(0,0,0,0.12);
+        --ed-text:    #1a5276;
+        --ed-stdin:   #333;
+        --ed-label:   rgba(0,0,0,0.4);
+    }
+    [data-editor="monokai"] {
+        --ed-bg:      #272822;
+        --ed-bg2:     #1e1f1c;
+        --ed-border:  rgba(255,255,255,0.08);
+        --ed-text:    #a6e22e;
+        --ed-stdin:   #f8f8f2;
+        --ed-label:   rgba(255,255,255,0.3);
+    }
+    [data-editor="solarized"] {
+        --ed-bg:      #002b36;
+        --ed-bg2:     #073642;
+        --ed-border:  rgba(255,255,255,0.1);
+        --ed-text:    #859900;
+        --ed-stdin:   #839496;
+        --ed-label:   rgba(255,255,255,0.35);
+    }
+
+    /* ── BASE ── */
+    body {
+        margin: 0;
+        font-family: 'IBM Plex Mono', monospace;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+        height: 48px;
+        background: var(--nav-bg);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        flex-shrink: 0;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 20px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+    .topbar-logo {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        color: var(--accent);
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .topbar-sep { width: 1px; height: 18px; background: var(--border); }
+
+    .topbar a:not(.topbar-logo):not(.tb-btn) {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .topbar a:not(.topbar-logo):not(.tb-btn):hover { color: var(--accent); }
+
+    /* ── TOPBAR TOGGLE BUTTONS ── */
+    .tb-toggle-group {
+        display: flex;
+        border: 1px solid var(--border2);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .tb-toggle {
+        background: none;
+        border: none;
+        border-right: 1px solid var(--border2);
+        color: var(--text-muted);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .tb-toggle:last-child { border-right: none; }
+    .tb-toggle:hover { background: var(--accent-dim); color: var(--accent); }
+    .tb-toggle.active { background: var(--accent); color: #000; font-weight: 700; }
+
+    .tb-btn {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 2px;
+        text-decoration: none;
+        transition: all 0.15s;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* ── MAIN SPLIT LAYOUT ── */
+    .split {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* ── LEFT PANEL (problem statement) ── */
+    .panel-left {
+        width: 42%;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    .panel-label {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .panel-body { padding: 20px; flex: 1; }
+
+    .problem-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 16px;
+        letter-spacing: -0.01em;
+    }
+
+    .problem-desc {
+        font-size: 13px;
+        line-height: 1.8;
+        color: var(--text-dim);
+        margin-bottom: 24px;
+    }
+
+    .section-label {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    .code-block {
+        background: var(--pre-bg);
+        border: 1px solid var(--border);
+        padding: 12px 14px;
+        font-size: 12px;
+        color: var(--accent);
+        border-radius: 2px;
+        margin-bottom: 20px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ── RESULT BOX ── */
+    .result-box {
+        margin-top: 20px;
+        padding: 14px 16px;
+        border-radius: 2px;
+        border: 1px solid var(--border);
+    }
+
+    .result-box.pass { border-color: var(--green); background: rgba(0,255,136,0.05); }
+    .result-box.fail { border-color: var(--red);   background: rgba(255,77,77,0.05); }
+
+    .result-score {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .result-score span { color: var(--accent); font-size: 20px; font-weight: 700; }
+
+    .result-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 2px;
+    }
+
+    .result-badge.pass { background: var(--green); color: #000; }
+    .result-badge.fail { background: var(--red);   color: #fff; }
+
+    /* ── RIGHT PANEL (editor) ── */
+    .panel-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* ── EDITOR TOOLBAR ── */
+    .editor-toolbar {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background: var(--ed-bg);
+        transition: background 0.3s;
+    }
+
+    .editor-toolbar-left { display: flex; align-items: center; gap: 12px; }
+    .editor-toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+    /* Language select */
+    .lang-select {
+        background: var(--ed-bg2);
+        color: var(--ed-text);
+        border: 1px solid var(--ed-border);
+        padding: 5px 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    /* Editor theme select */
+    .editor-theme-select {
+        background: var(--ed-bg2);
+        color: var(--ed-label);
+        border: 1px solid var(--ed-border);
+        padding: 5px 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    /* ── CODE TEXTAREA ── */
+    .code-area {
+        flex: 1;
+        background: var(--ed-bg);
+        color: var(--ed-text);
+        border: none;
+        border-bottom: 1px solid var(--ed-border);
+        padding: 16px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        resize: none;
+        outline: none;
+        width: 100%;
+        transition: background 0.3s, color 0.3s;
+        min-height: 0;
+    }
+
+    /* ── STDIN / OUTPUT AREA ── */
+    .bottom-split {
+        display: flex;
+        height: 200px;
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+    }
+
+    .stdin-pane, .output-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .stdin-pane { border-right: 1px solid var(--border); }
+
+    .pane-header {
+        padding: 6px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        background: var(--card-bg);
+    }
+
+    .pane-label {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .stdin-ta {
+        flex: 1;
+        background: var(--ed-bg2);
+        color: var(--ed-stdin);
+        border: none;
+        padding: 10px 14px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        resize: none;
+        outline: none;
+        width: 100%;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .output-pre {
+        flex: 1;
+        background: var(--pre-bg);
+        color: var(--text-dim);
+        padding: 10px 14px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        margin: 0;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        border: none;
+    }
+
+    /* ── ACTION BAR ── */
+    .action-bar {
+        padding: 10px 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        background: var(--nav-bg);
+    }
+
+    .btn-run {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 8px 18px;
+        border-radius: 2px;
+        border: 1px solid #238636;
+        background: rgba(35,134,54,0.15);
+        color: #3fb950;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .btn-run:hover { background: #238636; color: #fff; }
+
+    .btn-submit {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 8px 18px;
+        border-radius: 2px;
+        border: none;
+        background: var(--accent);
+        color: #000;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+
+    .btn-ai {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 8px 18px;
+        border-radius: 2px;
+        border: 1px solid rgba(142,68,173,0.5);
+        background: rgba(142,68,173,0.12);
+        color: #bf7fff;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .btn-ai:hover { background: #8e44ad; color: #fff; border-color: #8e44ad; }
+
+    /* ── AI PANEL ── */
+    .ai-panel {
+        display: none;
+        border-top: 1px solid var(--border);
+        background: var(--card-bg);
+        padding: 14px 16px;
+        font-size: 12px;
+        line-height: 1.7;
+        color: var(--text-dim);
+        max-height: 180px;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+
+    .ai-panel.visible { display: block; }
+
+    .ai-panel-header {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ai-dot {
+        width: 6px; height: 6px;
+        background: #bf7fff;
+        border-radius: 50%;
+        animation: aiPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes aiPulse {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50%       { opacity: 1;   transform: scale(1.3); }
+    }
+
+    /* ── TOAST ── */
+    #toast {
+        display: none;
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        background: var(--green);
+        color: #000;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        padding: 12px 20px;
+        border-radius: 2px;
+        z-index: 9999;
+        box-shadow: 0 4px 24px rgba(0,255,136,0.3);
+        animation: toastIn 0.3s ease;
+    }
+
+    @keyframes toastIn {
+        from { transform: translateX(20px); opacity: 0; }
+        to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2, rgba(255,255,255,0.13)); border-radius: 2px; }
+    </style>
+</head>
+
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+    <div class="topbar-left">
+        <a href="/" class="topbar-logo">CRT_</a>
+        <div class="topbar-sep"></div>
+        <a href="/problems">← Problems</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/leaderboard">Leaderboard</a>
+    </div>
+    <div class="topbar-right">
+        <!-- Site theme toggle -->
+        <div class="tb-toggle-group" id="siteThemeGroup">
+            <button class="tb-toggle active" onclick="setSiteTheme('dark')"  id="st-dark">Dark</button>
+            <button class="tb-toggle"        onclick="setSiteTheme('light')" id="st-light">Light</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── SPLIT LAYOUT ── -->
+<div class="split">
+
+    <!-- LEFT: Problem Statement -->
+    <div class="panel-left">
+        <div class="panel-header">
+            <span class="panel-label">Problem Statement</span>
+        </div>
+        <div class="panel-body">
+
+            <h1 class="problem-title">{{ problem.title }}</h1>
+            <p class="problem-desc">{{ problem.description }}</p>
+
+            <div class="section-label">Input Example</div>
+            <div class="code-block">{{ problem.input_example }}</div>
+
+            <div class="section-label">Output Example</div>
+            <div class="code-block">{{ problem.output_example }}</div>
+
+            <div class="section-label">Constraints</div>
+            <div class="code-block">{{ problem.constraints or "No constraints provided." }}</div>
+
+            {% if result is not none %}
+            <div class="result-box {% if result %}pass{% else %}fail{% endif %}">
+                <div class="result-score">
+                    <span>{{ passed }}</span> / {{ total_tests }} TEST CASES PASSED
+                </div>
+                {% if result %}
+                    <span class="result-badge pass">✔ ALL CORRECT</span>
+                {% else %}
+                    <span class="result-badge fail">✘ WRONG ANSWER</span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- RIGHT: Editor -->
+    <div class="panel-right">
+
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar">
+            <div class="editor-toolbar-left">
+                <select class="lang-select" id="lang">
+                    <option value="python">Python 3</option>
+                </select>
+
+                <!-- EDITOR THEME — separate from site theme -->
+                <select class="editor-theme-select" id="editorThemeSelect" onchange="setEditorTheme(this.value)">
+                    <option value="dark">Editor: Dark</option>
+                    <option value="light">Editor: Light</option>
+                    <option value="monokai">Editor: Monokai</option>
+                    <option value="solarized">Editor: Solarized</option>
+                </select>
+            </div>
+            <div class="editor-toolbar-right">
+                <span style="font-size:9px; letter-spacing:0.1em; color:var(--text-muted);">
+                    EDITOR THEME ↑ &nbsp;|&nbsp; SITE THEME →
+                </span>
+            </div>
+        </div>
+
+        <!-- Code Editor -->
+        <textarea class="code-area" id="code">{{ request.form.get('code', '# Write your code here\n') }}</textarea>
+
+        <!-- Bottom: Stdin + Output -->
+        <div class="bottom-split">
+
+            <div class="stdin-pane">
+                <div class="pane-header">
+                    <span class="pane-label">Custom Input</span>
+                </div>
+                <textarea class="stdin-ta" id="stdin">{{ problem.input_example }}</textarea>
+            </div>
+
+            <div class="output-pane">
+                <div class="pane-header">
+                    <span class="pane-label">Output</span>
+                    <span id="output-status" style="font-size:9px; letter-spacing:0.1em; color:var(--text-muted);"></span>
+                </div>
+                <pre class="output-pre" id="output">Run your code to see output here.</pre>
+            </div>
+
+        </div>
+
+        <!-- AI Response Panel -->
+        <div class="ai-panel" id="aiPanel">
+            <div class="ai-panel-header">
+                <span class="ai-dot"></span>
+                AI ASSISTANT
+            </div>
+            <div id="ai_output">Ask AI for help with your code...</div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-run" onclick="runCode()">▶ Run</button>
+
+            <form method="POST" id="submitForm" style="display:inline; margin:0;">
+                <input type="hidden" name="language" id="hiddenLang">
+                <input type="hidden" name="code"     id="hiddenCode">
+                <button type="button" class="btn-submit" onclick="prepareSubmit()">✔ Submit</button>
+            </form>
+
+            <button class="btn-ai" onclick="askAI()">◈ Ask AI</button>
+
+            <div style="flex:1;"></div>
+
+            <span style="font-size:9px; letter-spacing:0.08em; color:var(--text-muted);">
+                Ctrl+Enter to Run
+            </span>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast"
+     data-problem-id="{{ problem.id }}"
+     data-problem-title="{{ problem.title | e }}"
+     data-success="{{ '1' if success else '0' }}">
+    🎉 SOLVED! REDIRECTING...
+</div>
+
+<!-- Problem data for JS -->
+<script type="application/json" id="problem-data">
+{{ {"id": problem.id, "title": problem.title, "description": problem.description} | tojson }}
+</script>
+
+<script>
+(function () {
+    /* ── DATA ── */
+    var _toast  = document.getElementById('toast');
+    var _pdata  = JSON.parse(document.getElementById('problem-data').textContent);
+    var pid     = _pdata.id;
+    var ptitle  = _pdata.title;
+    var pdesc   = _pdata.description;
+
+    /* ── SITE THEME ── */
+    var savedSite = localStorage.getItem('crt-theme') || 'dark';
+    window.setSiteTheme = function (t) {
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('crt-theme', t);
+        document.querySelectorAll('#siteThemeGroup .tb-toggle').forEach(function (b) {
+            b.classList.toggle('active', b.id === 'st-' + t);
+        });
+    };
+    setSiteTheme(savedSite);
+
+    /* ── EDITOR THEME ── */
+    var savedEditor = localStorage.getItem('crt-editor-theme') || 'dark';
+    window.setEditorTheme = function (t) {
+        document.documentElement.setAttribute('data-editor', t);
+        localStorage.setItem('crt-editor-theme', t);
+        var sel = document.getElementById('editorThemeSelect');
+        if (sel) sel.value = t;
+    };
+    setEditorTheme(savedEditor);
+
+    /* ── KEYBOARD SHORTCUT Ctrl+Enter → Run ── */
+    document.getElementById('code').addEventListener('keydown', function (e) {
+        if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); runCode(); }
+    });
+
+    /* ── SUCCESS TOAST ── */
+    if (_toast.dataset.success === '1') {
+        _toast.style.display = 'block';
+        setTimeout(function () { window.location.href = '/problems'; }, 2500);
+    }
+
+    /* ── RUN ── */
+    window.runCode = async function () {
+        var statusEl = document.getElementById('output-status');
+        document.getElementById('output').textContent = 'Running...';
+        statusEl.textContent = '● RUNNING';
+        statusEl.style.color = 'var(--accent)';
+        try {
+            var res  = await fetch('/run_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    language:   document.getElementById('lang').value,
+                    code:       document.getElementById('code').value,
+                    stdin:      document.getElementById('stdin').value,
+                    problem_id: pid
+                })
+            });
+            var data = await res.json();
+            document.getElementById('output').textContent =
+                data.stdout || data.stderr || data.error || 'No Output';
+            statusEl.textContent = '● DONE';
+            statusEl.style.color = 'var(--green)';
+        } catch (err) {
+            document.getElementById('output').textContent = 'Server Error: ' + err;
+            statusEl.textContent = '● ERROR';
+            statusEl.style.color = 'var(--red)';
+        }
+    };
+
+    /* ── SUBMIT ── */
+    window.prepareSubmit = function () {
+        document.getElementById('hiddenLang').value = document.getElementById('lang').value;
+        document.getElementById('hiddenCode').value = document.getElementById('code').value;
+        document.getElementById('submitForm').submit();
+    };
+
+    /* ── ASK AI ── */
+    window.askAI = async function () {
+        var panel  = document.getElementById('aiPanel');
+        var output = document.getElementById('ai_output');
+        panel.classList.add('visible');
+        output.textContent = 'Thinking...';
+        try {
+            var res  = await fetch('/ai_help', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code:        document.getElementById('code').value,
+                    problemDesc: ptitle + '\n\n' + pdesc
+                })
+            });
+            var data = await res.json();
+            output.textContent = data.reply || data.error || 'AI not responding...';
+        } catch (err) {
+            output.textContent = 'Server Error: ' + err;
+        }
+    };
+
+}());
+</script>
+
+</body>
+</html>

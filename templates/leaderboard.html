@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-4">CRT Leaderboard</h4>
+
+<div class="card p-4"
+     style="background:#1b1f2a; border:1px solid #2a2f3a; border-radius:12px;">
+
+<table class="table table-dark align-middle">
+
+<thead style="color:#9aa4b2;">
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>
+  <div class="tooltip-box">
+    CF
+    <div class="tooltip-text">
+      <b>Codeforces</b><br>
+      Score = ((rating - 800)^2)/10<br>
+      Only if rating > 800
+    </div>
+  </div>
+</th>
+
+<th>
+  <div class="tooltip-box">
+    CC
+    <div class="tooltip-text">
+      <b>CodeChef</b><br>
+      Score = ((rating - 1200)^2)/10<br>
+      Only if rating > 1200
+    </div>
+  </div>
+</th>
+
+<th>
+  <div class="tooltip-box">
+    LC
+    <div class="tooltip-text">
+      <b>LeetCode</b><br>
+      Score = solved × 10
+    </div>
+  </div>
+</th>
+<th>Total</th>
+</tr>
+</thead>
+
+<tbody>
+{% for user in users %}
+<tr>
+
+<!-- 🏆 RANK SYSTEM -->
+<td>
+{% if loop.index == 1 %}
+    🥇
+{% elif loop.index == 2 %}
+    🥈
+{% elif loop.index == 3 %}
+    🥉
+{% else %}
+    #{{ loop.index }}
+{% endif %}
+</td>
+
+<td>
+    <b>{{ user.name }}</b>
+</td>
+
+<td>{{ user.cf_rating or 0 }}</td>
+<td>{{ user.cc_rating or 0 }}</td>
+<td>{{ user.lc_solved or 0 }}</td>
+
+<td style="color:#ffb800; font-weight:bold;">
+    {{ user.total_score }}
+</td>
+
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

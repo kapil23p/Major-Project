@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-4">Edit Profile</h4>
+
+<div class="card p-4"
+     style="background:#1b1f2a; border:1px solid #2a2f3a; border-radius:12px;">
+
+<!-- BUG FIX #10: inputs had no Bootstrap classes → unstyled/broken look -->
+<form method="POST">
+
+    <div class="mb-3">
+        <label class="form-label text-light">Codeforces Username</label>
+        <input name="cf"
+               class="form-control bg-dark text-light border-secondary"
+               placeholder="e.g. tourist"
+               value="{{ user.cf_handle or '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label text-light">CodeChef Username</label>
+        <input name="cc"
+               class="form-control bg-dark text-light border-secondary"
+               placeholder="e.g. gennady"
+               value="{{ user.cc_handle or '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label text-light">LeetCode Username</label>
+        <input name="lc"
+               class="form-control bg-dark text-light border-secondary"
+               placeholder="e.g. neal_wu"
+               value="{{ user.lc_handle or '' }}">
+    </div>
+
+    <button type="submit"
+            class="btn"
+            style="background:#ffb800; color:black; font-weight:bold;">
+        Update Profile
+    </button>
+
+    <a href="/dashboard"
+       class="btn btn-outline-secondary ms-2">
+        Cancel
+    </a>
+
+</form>
+
+</div>
+
+{% endblock %}

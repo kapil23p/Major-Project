@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&display=swap');
+
+.problems-wrap {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.page-title span {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.problem-count {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+}
+
+/* ── PROBLEM CARDS ── */
+.problems-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.problem-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 100px 120px 110px;
+    align-items: center;
+    padding: 14px 20px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--card-bg);
+    transition: all 0.15s;
+    text-decoration: none;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+}
+
+.problem-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+    transition: background 0.2s;
+}
+
+.problem-row:hover {
+    border-color: var(--border2, rgba(255,255,255,0.15));
+    background: var(--card-hover);
+    color: var(--text);
+    text-decoration: none;
+    transform: translateX(2px);
+}
+
+.problem-row:hover::before {
+    background: var(--accent);
+}
+
+.problem-row.solved::before {
+    background: var(--green, #00ff88);
+}
+
+/* ── TABLE HEADER ── */
+.problems-header {
+    display: grid;
+    grid-template-columns: 48px 1fr 100px 120px 110px;
+    padding: 8px 20px;
+    margin-bottom: 6px;
+}
+
+.problems-header span {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* ── CELLS ── */
+.col-num {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.col-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.col-points {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.col-points::before { content: '+'; }
+
+.col-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-solved   { color: var(--green, #00ff88); }
+.status-solved   .status-dot { background: var(--green, #00ff88); box-shadow: 0 0 6px var(--green, #00ff88); }
+.status-pending  { color: var(--text-muted); }
+.status-pending  .status-dot { background: var(--text-muted); }
+
+.col-action a {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.15s;
+    display: inline-block;
+}
+
+.col-action a:hover {
+    background: var(--accent);
+    color: #000;
+    text-decoration: none;
+}
+
+.col-action a.solved-btn {
+    border-color: var(--green, #00ff88);
+    color: var(--green, #00ff88);
+}
+
+.col-action a.solved-btn:hover {
+    background: var(--green, #00ff88);
+    color: #000;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.stat-chip-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stat-chip-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap {
+    margin-bottom: 28px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.progress-track {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.8s ease;
+}
+</style>
+
+<div class="problems-wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h4 class="page-title">PRACTICE <span>/ PROBLEMS</span></h4>
+        <span class="problem-count">{{ problems|length }} PROBLEMS</span>
+    </div>
+
+    <!-- STATS BAR -->
+    {% set solved_count = solved|length %}
+    {% set total_count = problems|length %}
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <span class="stat-chip-val">{{ total_count }}</span>
+            <span>TOTAL</span>
+        </div>
+        <div class="stat-chip-sep"></div>
+        <div class="stat-chip">
+            <span class="stat-chip-val" style="color:var(--green, #00ff88);">{{ solved_count }}</span>
+            <span>SOLVED</span>
+        </div>
+        <div class="stat-chip-sep"></div>
+        <div class="stat-chip">
+            <span class="stat-chip-val" style="color:var(--text-muted);">{{ total_count - solved_count }}</span>
+            <span>REMAINING</span>
+        </div>
+    </div>
+
+    <!-- PROGRESS -->
+    {% if total_count > 0 %}
+    <div class="progress-wrap">
+        <div class="progress-label">
+            <span>COMPLETION</span>
+            <span>{{ ((solved_count / total_count) * 100)|int }}%</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" style="width:{{ ((solved_count / total_count) * 100)|int }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TABLE HEADER -->
+    <div class="problems-header">
+        <span>#</span>
+        <span>Title</span>
+        <span>Points</span>
+        <span>Status</span>
+        <span>Action</span>
+    </div>
+
+    <!-- PROBLEM ROWS -->
+    <div class="problems-list">
+        {% for problem in problems %}
+        <div class="problem-row {% if problem.id in solved %}solved{% endif %}">
+
+            <span class="col-num">{{ '%02d'|format(loop.index) }}</span>
+
+            <span class="col-title">{{ problem.title }}</span>
+
+            <span class="col-points">{{ problem.points }} pts</span>
+
+            <span class="col-status">
+                {% if problem.id in solved %}
+                    <span class="status-dot"></span>
+                    <span class="status-solved">SOLVED</span>
+                {% else %}
+                    <span class="status-dot"></span>
+                    <span class="status-pending">PENDING</span>
+                {% endif %}
+            </span>
+
+            <span class="col-action">
+                <a href="/problem/{{ problem.id }}"
+                   class="{% if problem.id in solved %}solved-btn{% endif %}">
+                   {% if problem.id in solved %}RETRY →{% else %}SOLVE →{% endif %}
+                </a>
+            </span>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-4">Admin Panel</h4>
+
+<div class="card p-4"
+     style="background:#1b1f2a; border:1px solid #2a2f3a;">
+
+<table class="table table-dark align-middle">
+
+<thead style="color:#9aa4b2;">
+<tr>
+<th>#</th>
+<th>Name</th>
+<th>Email</th>
+<th>CF Rating</th>
+<th>CC Rating</th>
+<th>LC Solved</th>
+<th>Problems</th>
+<th>CRT</th>
+<th>Total</th>
+<th>Role</th>
+</tr>
+</thead>
+
+<tbody>
+{% for user in users %}
+<tr>
+<td>{{ loop.index }}</td>
+<td>{{ user.name }}</td>
+<td>{{ user.email }}</td>
+<td>{{ user.cf_rating or 0 }}</td>
+<td>{{ user.cc_rating or 0 }}</td>
+<td>{{ user.lc_solved or 0 }}</td>
+<!-- BUG FIX #6: removed user.hr_stars — field does not exist in User model -->
+<td>{{ user.problem_score or 0 }}</td>
+<td>{{ user.crt_score or 0 }}</td>
+<td style="color:#ffb800;">{{ user.total_score }}</td>
+<td>
+    {% if not user.is_admin %}
+        <a href="/make_admin/{{ user.id }}"
+           class="btn btn-sm btn-warning">
+            Make Admin
+        </a>
+    {% else %}
+        <span class="badge bg-success">Admin</span>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+{% endblock %}

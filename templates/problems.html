@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Problems</title>
+
+    <style>
+        body {
+            background: #0d1117;
+            color: white;
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        .problem {
+            background: #161b22;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Problems</h2>
+
+{% for p in problems %}
+    <div class="problem">
+        <a href="/problem/{{ p.id }}">{{ p.title }}</a>
+    </div>
+{% endfor %}
+
+</body>
+</html>

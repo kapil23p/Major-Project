@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+    <title>CRT Program</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* ─── THEME VARIABLES ─── */
+        [data-theme="dark"] {
+            --bg:           #0b0f14;
+            --bg2:          #111620;
+            --nav-bg:       #0d1117;
+            --nav-border:   rgba(255,255,255,0.07);
+            --border:       rgba(255,255,255,0.09);
+            --text:         #e6edf3;
+            --text-muted:   #556370;
+            --text-dim:     #8899a6;
+            --accent:       #ffb800;
+            --accent-dim:   rgba(255,184,0,0.12);
+            --card-bg:      rgba(255,255,255,0.03);
+            --table-stripe: rgba(255,255,255,0.02);
+        }
+
+        [data-theme="light"] {
+            --bg:           #f4f4ef;
+            --bg2:          #ebebе4;
+            --nav-bg:       #ffffff;
+            --nav-border:   rgba(0,0,0,0.08);
+            --border:       rgba(0,0,0,0.08);
+            --text:         #111620;
+            --text-muted:   #888;
+            --text-dim:     #555;
+            --accent:       #c98f00;
+            --accent-dim:   rgba(201,143,0,0.1);
+            --card-bg:      rgba(0,0,0,0.02);
+            --table-stripe: rgba(0,0,0,0.02);
+        }
+
+        /* ─── BASE ─── */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ─── NAVBAR ─── */
+        .navbar {
+            background: var(--nav-bg) !important;
+            border-bottom: 1px solid var(--nav-border);
+            padding: 0 24px;
+            height: 56px;
+        }
+
+        .navbar-brand {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.15em;
+            color: var(--accent) !important;
+            text-transform: uppercase;
+        }
+
+        .nav-link-item {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim) !important;
+            text-decoration: none;
+            padding: 6px 0;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link-item:hover {
+            color: var(--accent) !important;
+            border-bottom-color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ─── THEME TOGGLE ─── */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            padding: 5px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ─── LOGIN BUTTON ─── */
+        .btn-nav {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--accent);
+            color: #000 !important;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 2px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover {
+            opacity: 0.85;
+            text-decoration: none;
+        }
+
+        .btn-nav-ghost {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--text-dim) !important;
+            border: 1px solid var(--border);
+            padding: 6px 16px;
+            border-radius: 2px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent) !important;
+            text-decoration: none;
+        }
+
+        /* ─── CONTENT ─── */
+        .container {
+            padding-top: 32px;
+            padding-bottom: 40px;
+        }
+
+        /* ─── CARDS ─── */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        /* ─── TABLES ─── */
+        .table {
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .table-dark {
+            --bs-table-bg: transparent;
+            --bs-table-striped-bg: var(--table-stripe);
+            --bs-table-border-color: var(--border);
+            color: var(--text);
+        }
+
+        .table thead th {
+            color: var(--text-muted);
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-color: var(--border);
+            font-weight: 400;
+        }
+
+        /* ─── PRE / CODE ─── */
+        pre {
+            background: var(--bg2);
+            color: #00ffcc;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+        }
+
+        /* ─── BADGE ─── */
+        .badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.1em;
+        }
+
+        /* ─── HEADINGS ─── */
+        h4, h5 {
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.05em;
+            color: var(--text);
+        }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+
+    <a class="navbar-brand" href="/">CRT_PROGRAM</a>
+
+    <div class="d-flex align-items-center gap-4 ms-auto">
+
+      <a class="nav-link-item" href="/leaderboard">Leaderboard</a>
+      <a class="nav-link-item" href="/problems">Problems</a>
+
+      {% if current_user.is_authenticated %}
+          <a class="nav-link-item" href="/dashboard">Dashboard</a>
+
+          {% if current_user.is_admin %}
+              <a class="nav-link-item" style="color:var(--accent) !important;" href="/admin">Admin</a>
+              <a class="nav-link-item" style="color:var(--accent) !important;" href="/analytics">Analytics</a>
+          {% endif %}
+
+          <a class="btn-nav-ghost" href="/logout">Logout</a>
+      {% else %}
+          <a class="btn-nav" href="/login">Login →</a>
+      {% endif %}
+
+      <!-- THEME TOGGLE -->
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">
+          <span id="themeIcon">☀</span>
+          <span id="themeLabel">LIGHT</span>
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+(function () {
+    // Load saved theme
+    var saved = localStorage.getItem('crt-theme') || 'dark';
+    applyTheme(saved);
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        var icon  = document.getElementById('themeIcon');
+        var label = document.getElementById('themeLabel');
+        if (!icon || !label) return;
+        if (theme === 'dark') {
+            icon.textContent  = '☀';
+            label.textContent = 'LIGHT';
+        } else {
+            icon.textContent  = '◑';
+            label.textContent = 'DARK';
+        }
+    }
+
+    window.toggleTheme = function () {
+        var current = document.documentElement.getAttribute('data-theme');
+        var next    = current === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('crt-theme', next);
+        applyTheme(next);
+    };
+}());
+</script>
+
+</body>
+</html>

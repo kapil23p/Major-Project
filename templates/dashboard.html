@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mb-4">Your Profile</h4>
+
+<div class="card p-4"
+     style="background:#1b1f2a; border:1px solid #2a2f3a; border-radius:12px;">
+
+<!-- USER INFO -->
+<h5>{{ user.name }}</h5>
+<p style="color:#9aa4b2;">{{ user.email }}</p>
+
+<!-- TOTAL SCORE -->
+<h2 style="color:#ffb800;">
+    {{ user.total_score }}
+</h2>
+
+<a href="/edit_profile"
+   class="btn btn-sm mt-3"
+   style="background:#ffb800; color:black;">
+   Edit Profile
+</a>
+
+<!-- BADGE SYSTEM -->
+<div class="mt-3">
+{% if user.total_score >= 100000 %}
+    <span class="badge bg-warning text-dark">💎 Diamond</span>
+{% elif user.total_score >= 75000 %}
+    <span class="badge bg-danger">🥇 Gold</span>
+{% elif user.total_score >= 25000 %}
+    <!-- BUG FIX #9: "Sliver" → "Silver" -->
+    <span class="badge bg-info">🥈 Silver</span>
+{% elif user.total_score >= 10000 %}
+    <span class="badge bg-success">🥉 Bronze</span>
+{% else %}
+    <span class="badge bg-secondary">🪨 Stone</span>
+{% endif %}
+</div>
+
+<hr>
+
+<!-- INTERNAL SCORES -->
+<h5 class="mt-3">Platform Performance</h5>
+
+<div class="d-flex gap-3 mt-2">
+    <span class="badge bg-success">Problems: {{ user.problem_score or 0 }}</span>
+    <span class="badge bg-warning text-dark">CRT: {{ user.crt_score or 0 }}</span>
+</div>
+
+<hr>
+
+<!-- EXTERNAL PLATFORMS -->
+<h5 class="mt-3">External Platforms</h5>
+
+<div class="mt-3 d-flex flex-wrap gap-2">
+
+    <span class="badge bg-warning text-dark">
+        CF Rating: {{ user.cf_rating or 0 }}
+    </span>
+
+    <span class="badge bg-primary">
+        CC Rating: {{ user.cc_rating or 0 }}
+    </span>
+
+    <span class="badge bg-success">
+        LC Solved: {{ user.lc_solved or 0 }}
+    </span>
+
+</div>
+
+</div>
+
+{% endblock %}
