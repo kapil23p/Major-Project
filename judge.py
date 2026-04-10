@@ -3,7 +3,14 @@ import tempfile
 import os
 import sys
 
+BANNED = ['import os', 'import sys', 'import subprocess',
+          'import shutil', '__import__', 'open(',
+          'exec(', 'eval(', 'compile(']
+
 def run_code(language, source_code, stdin=""):
+    for banned in BANNED:
+        if banned in source_code:
+            return {"error": f"Security Error: '{banned}' is not allowed."}
 
     if language != "python":
         return {"error": "Only Python supported"}
@@ -16,8 +23,6 @@ def run_code(language, source_code, stdin=""):
         print("RUNNING FILE:", file_name)
         print("INPUT:", stdin)
 
-        # BUG FIX #5: "py" is Windows-only. Use sys.executable so this always
-        # runs the same Python interpreter that is running Flask.
         result = subprocess.run(
             [sys.executable, file_name],
             input=stdin,
