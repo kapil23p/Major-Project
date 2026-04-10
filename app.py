@@ -428,48 +428,45 @@ def run_code_route():
 
 
 # ================= INIT =================
+# Runs under both gunicorn and direct python
+with app.app_context():
+    db.create_all()
+    admin_user = User.query.filter_by(email="pavankapil177@gmail.com").first()
+    if admin_user and not admin_user.is_admin:
+        admin_user.is_admin = True
+        db.session.commit()
+    if Problem.query.count() == 0:
+        db.session.add_all([
+            Problem(
+                title="Addition of Two Numbers",
+                description="Read two integers and print their sum.",
+                input_example="2 3",
+                output_example="5",
+                correct_answer="5",
+                constraints="1 ≤ a, b ≤ 10^6",
+                hidden_inputs="1 2|3 4|5 6|10 20|100 200|7 8|9 10|50 50|123 456|11 22|13 14|15 16|17 18|19 20|21 22|23 24|25 26|27 28|29 30|31 32",
+                hidden_outputs="3|7|11|30|300|15|19|100|579|33|27|31|35|39|43|47|51|55|59|63"
+            ),
+            Problem(
+                title="Multiply Two Numbers",
+                description="Read two integers and print their product.",
+                input_example="4 5",
+                output_example="20",
+                constraints="1 ≤ a, b ≤ 10^4",
+                hidden_inputs="1 2|3 4|5 6|2 3|10 10|7 8|9 9|12 12|11 11|6 7|8 9|10 11|12 13|14 15|16 17|18 19|20 21|22 23|24 25|26 27",
+                hidden_outputs="2|12|30|6|100|56|81|144|121|42|72|110|156|210|272|342|420|506|600|702"
+            ),
+            Problem(
+                title="Square of a Number",
+                description="Read an integer and print its square.",
+                input_example="6",
+                output_example="36",
+                constraints="1 ≤ n ≤ 10^5",
+                hidden_inputs="1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20",
+                hidden_outputs="1|4|9|16|25|36|49|64|81|100|121|144|169|196|225|256|289|324|361|400"
+            )
+        ])
+        db.session.commit()
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-
-        # BUG FIX #3: set admin once at startup, not on every HTTP request
-        admin_user = User.query.filter_by(email="pavankapil177@gmail.com").first()
-        if admin_user and not admin_user.is_admin:
-            admin_user.is_admin = True
-            db.session.commit()
-
-        if Problem.query.count() == 0:
-            db.session.add_all([
-                Problem(
-                    title="Addition of Two Numbers",
-                    description="Read two integers and print their sum.",
-                    input_example="2 3",
-                    output_example="5",
-                    correct_answer="5",
-                    constraints="1 ≤ a, b ≤ 10^6",
-                    hidden_inputs="1 2|3 4|5 6|10 20|100 200|7 8|9 10|50 50|123 456|11 22|13 14|15 16|17 18|19 20|21 22|23 24|25 26|27 28|29 30|31 32",
-                    hidden_outputs="3|7|11|30|300|15|19|100|579|33|27|31|35|39|43|47|51|55|59|63"
-                ),
-                Problem(
-                    title="Multiply Two Numbers",
-                    description="Read two integers and print their product.",
-                    input_example="4 5",
-                    output_example="20",
-                    constraints="1 ≤ a, b ≤ 10^4",
-                    hidden_inputs="1 2|3 4|5 6|2 3|10 10|7 8|9 9|12 12|11 11|6 7|8 9|10 11|12 13|14 15|16 17|18 19|20 21|22 23|24 25|26 27",
-                    hidden_outputs="2|12|30|6|100|56|81|144|121|42|72|110|156|210|272|342|420|506|600|702"
-                ),
-                Problem(
-                    title="Square of a Number",
-                    description="Read an integer and print its square.",
-                    input_example="6",
-                    output_example="36",
-                    constraints="1 ≤ n ≤ 10^5",
-                    hidden_inputs="1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20",
-                    hidden_outputs="1|4|9|16|25|36|49|64|81|100|121|144|169|196|225|256|289|324|361|400"
-                )
-            ])
-            db.session.commit()
-
     app.run(debug=True)
