@@ -105,6 +105,8 @@ app = Flask(__name__)
 
 # ================= CONFIG =================
 app.config['SECRET_KEY'] = "supersecret"
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///crt.db')
 uri = os.getenv('DATABASE_URL', 'sqlite:///crt.db')
 if uri.startswith('postgres://'):
